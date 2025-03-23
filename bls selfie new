@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Selfie BLS</title>
+</head>
+<body>
+    <video id="video" autoplay></video>
+    <button id="start">Démarrer l'enregistrement</button>
+    <script>
+        const video = document.getElementById("video");
+        const startButton = document.getElementById("start");
+
+        async function startRecording() {
+            let stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+            video.srcObject = stream;
+
+            let mediaRecorder = new MediaRecorder(stream);
+            let chunks = [];
+
+            mediaRecorder.ondataavailable = event => chunks.push(event.data);
+            mediaRecorder.onstop = () => {
+                let blob = new Blob(chunks, { type: "video/webm" });
+                let url = URL.createObjectURL(blob);
+                window.location.href = url; // Redirige vers la vidéo enregistrée
+            };
+
+            mediaRecorder.start();
+            setTimeout(() => mediaRecorder.stop(), 5000);
+        }
+
+        startButton.addEventListener("click", startRecording);
+    </script>
+</body>
+</html>
